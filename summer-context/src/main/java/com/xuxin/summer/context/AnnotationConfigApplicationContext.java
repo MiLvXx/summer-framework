@@ -48,6 +48,7 @@ public class AnnotationConfigApplicationContext implements ConfigurableApplicati
     private final Set<String> creatingBeanNames;
 
     public AnnotationConfigApplicationContext(Class<?> configClass, PropertyResolver propertyResolver) {
+        ApplicationContextUtils.setApplicationContext(this);
         this.propertyResolver = propertyResolver;
 
         // 扫描获取所有Bean的Class类型
