@@ -63,11 +63,9 @@ public class AnnotationConfigApplicationContext implements ConfigurableApplicati
         // 创建@Configuration类型的Bean
         // 此类Bean为工厂，应当首先实例化
         this.beans.values().stream()
-                .filter(this::isConfigurationDefinition).sorted()
-                .map(def -> {
-                    createBeanAsEarlySingleton(def);
-                    return def.getName();
-                }).collect(Collectors.toList());
+                .filter(this::isConfigurationDefinition)
+                .sorted()
+                .forEach(this::createBeanAsEarlySingleton);
         // 创建BeanPostProcessor类型的Bean
         List<BeanPostProcessor> processors = this.beans.values().stream()
                 .filter(this::isBeanPostProcessorDefinition)
