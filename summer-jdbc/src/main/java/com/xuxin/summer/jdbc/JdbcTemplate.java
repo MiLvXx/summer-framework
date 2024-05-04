@@ -94,7 +94,7 @@ public class JdbcTemplate {
                         throw new DataAccessException("Multiple rows inserted.");
                     }
                     try (ResultSet rs = ps.getGeneratedKeys()) {
-                        while (rs.next()) {
+                        if (rs.next()) {
                             return ((Number) rs.getObject(1));
                         }
                     }
