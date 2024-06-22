@@ -11,6 +11,7 @@ import java.sql.SQLException;
  * @author xuxin
  * @since 2024/5/3
  */
+@FunctionalInterface
 public interface ResultSetExtractor<T> {
 
     @Nullable
