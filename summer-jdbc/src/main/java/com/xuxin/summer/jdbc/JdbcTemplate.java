@@ -117,6 +117,7 @@ public class JdbcTemplate {
     }
 
     public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {
+        // 尝试获取当前事务连接
        Connection current = TransactionalUtils.getCurrentConnection();
         if (current != null) {
             try {
@@ -125,7 +126,7 @@ public class JdbcTemplate {
                 throw new DataAccessException(e);
             }
         }
-
+        // 无事务，从DataSource获取新连接
         try (Connection newConn = dataSource.getConnection()) {
             final boolean autoCommit = newConn.getAutoCommit();
             if (!autoCommit) {

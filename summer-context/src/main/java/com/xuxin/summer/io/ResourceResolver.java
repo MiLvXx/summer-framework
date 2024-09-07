@@ -54,6 +54,7 @@ public class ResourceResolver {
 			throws IOException, URISyntaxException {
 		
 		logger.atDebug().log("scan path: {}", path);
+		// 通过 ClassLoader 获取 URL列表
 		Enumeration<URL> en = getContextClassLoader().getResources(path);
 		while (en.hasMoreElements()) {
 			URL url = en.nextElement();

@@ -22,13 +22,14 @@ public class ProxyResolver {
 
     private static ProxyResolver INSTANCE = null;
 
+    /* 单例模式 */
     public static ProxyResolver getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new ProxyResolver();
         }
         return INSTANCE;
     }
-
+    /* 私有构造器 */
     private ProxyResolver() {
     }
 
