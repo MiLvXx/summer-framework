@@ -9,7 +9,6 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
-import org.yaml.snakeyaml.resolver.Resolver;
 
 public class YamlUtils {
     public static Map<String, Object> loadYaml(String path) {
@@ -45,9 +44,3 @@ public class YamlUtils {
     }
 }
 
-class NoImplicitResolver extends Resolver {
-    public NoImplicitResolver() {
-        super();
-        super.yamlImplicitResolvers.clear();
-    }
-}

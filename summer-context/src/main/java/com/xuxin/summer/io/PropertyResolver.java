@@ -165,6 +165,3 @@ public class PropertyResolver {
         return key;
     }
 }
-
-record PropertyExpr(String key, String defaultValue) {
-}
