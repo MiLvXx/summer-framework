@@ -527,7 +527,7 @@ public class AnnotationConfigApplicationContext implements ConfigurableApplicati
                         ClassUtils.findAnnotationMethod(clazz, PostConstruct.class),
                         ClassUtils.findAnnotationMethod(clazz, PreDestroy.class));
                 addBeanDefinitions(defs, def);
-                logger.atDebug().log("define bean: {}", def);
+                logger.atDebug().log("define bean: {} by constructor", def);
 
                 /* 查找是否有@Configuration */
                 Configuration configuration = ClassUtils.findAnnotation(clazz, Configuration.class);
@@ -546,28 +546,7 @@ public class AnnotationConfigApplicationContext implements ConfigurableApplicati
         for (Method method : clazz.getDeclaredMethods()) {
             Bean bean = method.getAnnotation(Bean.class);
             if (bean != null) {
-                int mod = method.getModifiers();
-                if (Modifier.isAbstract(mod)) {
-                    throw new BeanDefinitionException(
-                            "@Bean method " + clazz.getName() + "." + method.getName() + " must not be abstract.");
-                }
-                if (Modifier.isFinal(mod)) {
-                    throw new BeanDefinitionException(
-                            "@Bean method " + clazz.getName() + "." + method.getName() + " must not be final.");
-                }
-                if (Modifier.isPrivate(mod)) {
-                    throw new BeanDefinitionException(
-                            "@Bean method " + clazz.getName() + "." + method.getName() + " must not be private.");
-                }
-                Class<?> beanClass = method.getReturnType();
-                if (beanClass.isPrimitive()) {
-                    throw new BeanDefinitionException("@Bean method " + clazz.getName() + "." + method.getName()
-                            + " must not return primitive type.");
-                }
-                if (beanClass == void.class || beanClass == Void.class) {
-                    throw new BeanDefinitionException(
-                            "@Bean method " + clazz.getName() + "." + method.getName() + " must not return void.");
-                }
+                Class<?> beanClass = getaClass(clazz, method);
                 BeanDefinition def = new BeanDefinition(ClassUtils.getBeanName(method), beanClass, factoryBeanName,
                         method, getOrder(method),
                         method.isAnnotationPresent(Primary.class),
@@ -575,11 +554,37 @@ public class AnnotationConfigApplicationContext implements ConfigurableApplicati
                         bean.destroyMethod().isEmpty() ? null : bean.destroyMethod(),
                         null, null);
                 addBeanDefinitions(defs, def);
-                logger.atDebug().log("define bean: {}", def);
+                logger.atDebug().log("define bean: {} by factory", def);
             }
         }
     }
-    
+
+    private static Class<?> getaClass(Class<?> clazz, Method method) {
+        int mod = method.getModifiers();
+        if (Modifier.isAbstract(mod)) {
+            throw new BeanDefinitionException(
+                    "@Bean method " + clazz.getName() + "." + method.getName() + " must not be abstract.");
+        }
+        if (Modifier.isFinal(mod)) {
+            throw new BeanDefinitionException(
+                    "@Bean method " + clazz.getName() + "." + method.getName() + " must not be final.");
+        }
+        if (Modifier.isPrivate(mod)) {
+            throw new BeanDefinitionException(
+                    "@Bean method " + clazz.getName() + "." + method.getName() + " must not be private.");
+        }
+        Class<?> beanClass = method.getReturnType();
+        if (beanClass.isPrimitive()) {
+            throw new BeanDefinitionException("@Bean method " + clazz.getName() + "." + method.getName()
+                    + " must not return primitive type.");
+        }
+        if (beanClass == void.class || beanClass == Void.class) {
+            throw new BeanDefinitionException(
+                    "@Bean method " + clazz.getName() + "." + method.getName() + " must not return void.");
+        }
+        return beanClass;
+    }
+
     int getOrder(Method method) {
         Order order = method.getAnnotation(Order.class);
         return order == null ? Integer.MAX_VALUE : order.value();

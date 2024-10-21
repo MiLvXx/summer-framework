@@ -43,6 +43,7 @@ public class JdbcTemplate {
 
     public <T> T queryForObject(String sql, RowMapper<T> rowMapper, Object... args) {
         return execute(preparedStatementCreator(sql, args),
+                // callback
                 (PreparedStatement ps) -> {
                     T t = null;
                     try (ResultSet rs = ps.executeQuery()) {
@@ -79,12 +80,7 @@ public class JdbcTemplate {
     }
 
     public Number updateAndReturnGeneratedKey(String sql, Object... args) {
-        return execute(
-                (Connection conn) -> {
-                    var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                    bindArgs(ps, args);
-                    return ps;
-                },
+        return execute(createPreStatAndGetKeys(sql, args),
                 (PreparedStatement ps) -> {
                     int n = ps.executeUpdate();
                     if (n == 0) {
@@ -118,7 +114,7 @@ public class JdbcTemplate {
 
     public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {
         // 尝试获取当前事务连接
-       Connection current = TransactionalUtils.getCurrentConnection();
+        Connection current = TransactionalUtils.getCurrentConnection();
         if (current != null) {
             try {
                 return action.doInConnection(current);
@@ -133,13 +129,21 @@ public class JdbcTemplate {
                 newConn.setAutoCommit(true);
             }
             T result = action.doInConnection(newConn);
-            if (!autoCommit){
+            if (!autoCommit) {
                 newConn.setAutoCommit(false);
             }
             return result;
         } catch (SQLException e) {
             throw new DataAccessException(e);
         }
+    }
+
+    private PreparedStatementCreator createPreStatAndGetKeys(String sql, Object... args) {
+        return (Connection conn) -> {
+            var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            bindArgs(ps, args);
+            return ps;
+        };
     }
 
     private PreparedStatementCreator preparedStatementCreator(String sql, Object... args) {

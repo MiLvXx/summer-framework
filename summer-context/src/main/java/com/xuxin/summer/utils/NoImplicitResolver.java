@@ -10,7 +10,6 @@ import org.yaml.snakeyaml.resolver.Resolver;
  */
 public class NoImplicitResolver extends Resolver {
     public NoImplicitResolver() {
-        super();
         super.yamlImplicitResolvers.clear();
     }
 }

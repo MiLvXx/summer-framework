@@ -38,6 +38,7 @@ public class JdbcWithoutTxTest extends JdbcTestBase {
             // query name:
             assertEquals("Bob", jdbcTemplate.queryForObject(SELECT_USER_NAME, String.class, userId1));
             assertEquals(12, jdbcTemplate.queryForObject(SELECT_USER_AGE, int.class, userId1));
+            assertEquals(12, jdbcTemplate.queryForNumber(SELECT_USER_AGE, userId1));
             // update user:
             int n1 = jdbcTemplate.update(UPDATE_USER, "Bob Jones", 18, bob.id);
             assertEquals(1, n1);
